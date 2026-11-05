@@ -45,7 +45,7 @@ export async function getTransactions(params?: {
     });
 
     if (search) {
-        query = query.ilike("description", `%${search}`); // Filter by description if search is provided
+        query = query.ilike("description", `%${search}%`); // Filter by description if search is provided
     };
 
     const from = (page - 1) * limit; 
