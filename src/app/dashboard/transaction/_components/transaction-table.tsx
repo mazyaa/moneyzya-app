@@ -49,7 +49,6 @@ const TABLE_HEADER = [
 export default function TransactionTable({
   transactions,
   isLoading,
-  // refetch,
   page,
   limit,
   search,

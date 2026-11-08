@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import TransactionTable from "./transaction-table";
 import { getTransactions } from "@/features/transaction/action";
 import { useState } from "react";
+import CreateTransactionCard from "./create-transaction-card";
 
 export default function Transaction() {
   const [page, setPage] = useState(1);
@@ -28,6 +29,8 @@ export default function Transaction() {
         setLimit={setLimit}
         setSearch={setSearch}
       />
+
+      <CreateTransactionCard refetch={refetch}/>
     </div>
   );
 }

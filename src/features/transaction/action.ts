@@ -1,5 +1,6 @@
 "use server";
 
+import { Transactions } from "@/app/types/transaction";
 import { createClient } from "@/lib/supabase/server";
 
 export async function getBalanceSummary() {
@@ -36,32 +37,48 @@ export async function getTransactions(params?: {
   page?: number;
   search?: string;
 }) {
-    const { limit = 10, page = 1, search = "" } = params || {};
+  const { limit = 10, page = 1, search = "" } = params || {};
 
-    const supabase = await createClient();
+  const supabase = await createClient();
 
-    let query = supabase.from("transactions").select("id, amount, type, description, date, category", {
-        count: "exact", // Get the total count of rows
+  let query = supabase
+    .from("transactions")
+    .select("id, amount, type, description, date, category", {
+      count: "exact", // Get the total count of rows
     });
 
-    if (search) {
-        query = query.ilike("description", `%${search}%`); // Filter by description if search is provided
-    };
+  if (search) {
+    query = query.ilike("description", `%${search}%`); // Filter by description if search is provided
+  }
 
-    const from = (page - 1) * limit; 
-    const to = from + limit - 1;
-    
-    const { data, error, count } = await query.range(from, to); // Fetch the data with pagination
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
 
-    if (error) {
-        throw new Error(`Failed to fetch transactions: ${error.message}`);
-    }
+  const { data, error, count } = await query.range(from, to); // Fetch the data with pagination
 
-    const totalData = count || 0; // Total number of rows
+  if (error) {
+    throw new Error(`Failed to fetch transactions: ${error.message}`);
+  }
 
-    return {
-        data,
-        totalData, // Total number of rows
-        totalPages: Math.ceil(totalData / limit), // Calculate total pages
-    };
-};
+  const totalData = count || 0; // Total number of rows
+
+  return {
+    data,
+    totalData, // Total number of rows
+    totalPages: Math.ceil(totalData / limit), // Calculate total pages
+  };
+}
+
+export async function createTransaction(
+  payload: Omit<Transactions, "id" | "user_id" | "embedding">,
+) {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase.from("transactions").insert(payload);
+
+  if (error) {
+    throw new Error(`Failed to create transaction: ${error.message}`);
+  }
+
+  return data;
+}
