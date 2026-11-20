@@ -1,6 +1,6 @@
 "use server";
 
-import { Transactions } from "@/app/types/transaction";
+import { Transaction } from "@/app/types/transaction";
 import { createClient } from "@/lib/supabase/server";
 
 export async function getBalanceSummary() {
@@ -45,7 +45,7 @@ export async function getTransactions(params?: {
     .from("transactions")
     .select("id, amount, type, description, date, category", {
       count: "exact", // Get the total count of rows
-    });
+    }).order("date");
 
   if (search) {
     query = query.ilike("description", `%${search}%`); // Filter by description if search is provided
@@ -70,7 +70,7 @@ export async function getTransactions(params?: {
 }
 
 export async function createTransaction(
-  payload: Omit<Transactions, "id" | "user_id" | "embedding">,
+  payload: Omit<Transaction, "id" | "user_id" | "embedding">,
 ) {
   const supabase = await createClient();
   
@@ -82,3 +82,15 @@ export async function createTransaction(
 
   return data;
 }
+
+export async function deleteTransaction(id: string) {
+  const supabase = await createClient();
+
+  const { error, success } = await supabase.from("transactions").delete().eq("id", id);
+
+  if (error) {
+    throw new Error(`Failed to delete transaction: ${error.message}`);
+  }
+
+  return success;
+};
