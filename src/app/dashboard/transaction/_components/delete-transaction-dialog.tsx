@@ -20,12 +20,12 @@ export default function DeleteTransactionDialog({
 }: {
   selectedTransaction: {
     data: Omit<Transaction, 'user_id' | 'embedding'>;
-    action: "delete" | "edit";
+    action: "delete" | "update";
   } | null;
   setSelectedTransaction: Dispatch<
     SetStateAction<{
       data: Omit<Transaction, 'user_id' | 'embedding'>;
-      action: "delete" | "edit";
+      action: "delete" | "update";
     } | null>
   >;
   refetch: () => void;
